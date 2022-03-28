@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/evgenykolotov/typescript-algorithms/issues"
   },
-  "homepage": "https://github.com/evgenykolotov/typescript-algorithms#readme"
+  "homepage": "https://github.com/evgenykolotov/typescript-algorithms#readme",
+  "devDependencies": {
+    "typescript": "^4.6.3"
+  }
 }
