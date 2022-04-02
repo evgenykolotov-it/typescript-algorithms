@@ -1,11 +1,29 @@
 import LinkedListNode, { ILinkedListNode } from "./LinkedListNode";
+import Comparator, { CompareFunction } from "../../utils/Comparator";
 
+/**
+ * @type {ForEachCallback}
+ * Тип функции, вызываемой при переборе связного списка.
+ */
 export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
-export type ComparatorCallback<T> = (value: T, target: T) => boolean;
+/**
+/**
+ * @type {FindComparatorCallback}
+ * Тип функции, которую можно дополнительно передать, для поиска элемента в списке.
+ */
 export type FindComparatorCallback<T> = (value: T) => boolean;
+/**
+ * @type {ToStringCallback}
+ * Тип функции, передаваемой для преобразования списка к строке.
+ */
 export type ToStringCallback<T> = (value: T) => string;
 
-export interface ILinkedList<T> {
+/**
+ * Интерфейс однонаправленного связного списка.
+ * @interface ILinkedList
+ */
+export interface ILinkedList<T> { 
+  size: () => number;
   prepend: (value: T) => void;
   append: (value: T) => void;
   remove: (value: T) => void;
@@ -16,31 +34,56 @@ export interface ILinkedList<T> {
   toString: (callback?: ToStringCallback<T>) => string;
 }
 
+/**
+ * @class
+ * @classdesc Класс, реализующий однонаправленно связный список.
+ * @implements {ILinkedList}
+ */
 export default class LinkedList<T> implements ILinkedList<T> {
   private length: number;
+  private compare: Comparator<T>;
   private head: ILinkedListNode<T> | null = null;
-  private readonly comparator: ComparatorCallback<T>;
 
-  constructor(comparator: ComparatorCallback<T>) {
+  /**
+   * @constructor
+   * @param {ComparatorCallback} comparator - Функция, для сравнения элементов.
+   */
+  constructor(comparatorFunction: CompareFunction<T>) {
     this.length = 0;
-    this.comparator = comparator;
+    this.compare = new Comparator(comparatorFunction);
   }
 
+  /**
+   * Метод для добавления элемента в начало связного списка.
+   * @param {*} value - Значение для добавления в начало связного списка.
+   */
   public prepend(value: T): void {
     this.head = new LinkedListNode<T>(value, this.head);
     this.length++;
   }
 
+  /**
+   * Метод для добавления элемента в конец связного списка.
+   * @param {*} value - Значение для добавления в конец связного списка.
+   */
   public append(value: T): void {
-    if (!this.head) this.head = new LinkedListNode<T>(value);
-    let current: ILinkedListNode<T> | null = this.head;
-    while (current.next) {
-      current = current?.next;
+    if (!this.head) {
+      this.head = new LinkedListNode<T>(value);
+    } else {
+      let current: ILinkedListNode<T> | null = this.head;
+      while (current.next) {
+        current = current?.next;
+      }
+      current.next = new LinkedListNode<T>(value);
     }
-    current.next = new LinkedListNode<T>(value);
     this.length++;
   }
 
+  /**
+   * Метод для добавления элемента, после указанного.
+   * @param {*} cell - Значение, по которому будет произведён поиск элемента. 
+   * @param {*} value - Значение для добавления элемента. 
+   */
   public insertAfter(cell: T, value: T): void {
     const afterNode = this.find(cell);
     if (afterNode) {
@@ -49,15 +92,19 @@ export default class LinkedList<T> implements ILinkedList<T> {
     }
   }
 
+  /**
+   * Метод для удаления элемента из связного списка.
+   * @param {*} value - Значение для удаления из связного списка.
+   */
   public remove(value: T): void {
     if (!this.head) return;
-    while (this.head && this.comparator(this.head.value, value)) {
+    while (this.head && this.compare.equal(this.head.value, value)) {
       this.head = this.head.next;
       this.length--;
     }
     let current: ILinkedListNode<T> | null = this.head;
     while (current?.next) {
-      if (this.comparator(value, current.value)) {
+      if (this.compare.equal(value, current.next.value)) {
         current.next = current.next.next;
         this.length--;
       } else {
@@ -66,19 +113,29 @@ export default class LinkedList<T> implements ILinkedList<T> {
     }
   }
 
+  /**
+   * Метод для поиска элемента связного списка, по значению.
+   * @param {*} target - Значение, по которому будет идти поиск элемента.
+   * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
+   * @returns {ILinkedListNode | null} - Возвращаемое значение.
+   */
   public find(target: T, callback?: FindComparatorCallback<T>): ILinkedListNode<T> | null {
     if (!this.head) return null;
     let current: ILinkedListNode<T> | null = this.head;
     while (current) {
-      if (this.comparator && this.comparator(current.value, target)) return current;
       if (callback && callback(current.value)) return current;
+      if (this.compare && this.compare.equal(current.value, target)) return current;
       current = current.next;
     }
     return null;
   }
 
+  /**
+   * Метод для преобразования связного списка в массив.
+   * @returns {ILinkedListNode[]}
+   */
   public toArray(): Array<ILinkedListNode<T>> {
-    const nodes: Array<ILinkedListNode<T>> = new Array(this.length);
+    const nodes: Array<ILinkedListNode<T>> = new Array();
     let currentNode = this.head;
     while (currentNode) {
       nodes.push(currentNode);
@@ -87,6 +144,10 @@ export default class LinkedList<T> implements ILinkedList<T> {
     return nodes;
   }
 
+  /**
+   * Метод для перебора связного списка с выполнением функции для каждого элемента.
+   * @param {ForEachCallback} callback - Функция для выполнения на элементе.
+   */
   public forEach(callback: ForEachCallback<T>): void {
     let current = this.head;
     while (current) {
@@ -95,7 +156,20 @@ export default class LinkedList<T> implements ILinkedList<T> {
     }
   }
 
+  /**
+   * Метод для преобразования связного списка к строке.
+   * @param {ToStringCallback} callback - Функция для преобразования к строке.
+   * @returns {string}
+   */
   public toString(callback?: ToStringCallback<T>): string {
-    return this.toArray().map((node) => node.toString(callback)).toString();
+    return this.toArray().map(node => node.toString()).toString();
+  }
+
+  /**
+   * Метод, возвращающий текущую длинну связного списка.
+   * @returns - Длинна связного списка.
+   */
+  public size(): number {
+    return this.length;
   }
 }
