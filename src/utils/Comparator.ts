@@ -2,13 +2,13 @@
  * @type {CompareFunction}
  * Тип функции компаратора, используемой при сравнении элементов.
  */
-export type CompareFunction<T> = (a: T, b: T) => number;
+export type CompareFunction<T> = (a: T, b: T) => boolean;
 
 /**
  * @class
  * @classdesc Служебный класс, предоставляющий полезные функции по сравнению элементов.
  */
-export default class Comparator<T> {
+export default class Comparator<T = number> {
   private compare: CompareFunction<T>;
 
   /**
@@ -26,9 +26,8 @@ export default class Comparator<T> {
    * @param {number} b - Элемент для сравнения.
    * @returns - Результат сравнения.
    */
-  public static defaultCompareFunction<T>(a: number, b: number): number {
-    if (a - b === 0) return 0;
-    return a < b ? -1 : 1
+  public static defaultCompareFunction<T>(a: number, b: number): boolean {
+    return a - b === 0;
   }
 
   /**
@@ -38,6 +37,6 @@ export default class Comparator<T> {
    * @returns Результат сравнения.
    */
   public equal(a: T, b: T): boolean {
-    return this.compare(a, b) === 0;
+    return this.compare(a, b);
   }
 }
