@@ -1,4 +1,4 @@
-import LinkedListNode, { ILinkedListNode } from "./LinkedListNode";
+import LinkedListNode, { ILinkedListNode, ToStringCallback } from "./LinkedListNode";
 import Comparator, { CompareFunction } from "../../utils/Comparator";
 
 /**
@@ -6,17 +6,6 @@ import Comparator, { CompareFunction } from "../../utils/Comparator";
  * Тип функции, вызываемой при переборе связного списка.
  */
 export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
-/**
-/**
- * @type {FindComparatorCallback}
- * Тип функции, которую можно дополнительно передать, для поиска элемента в списке.
- */
-export type FindComparatorCallback<T> = (value: T) => boolean;
-/**
- * @type {ToStringCallback}
- * Тип функции, передаваемой для преобразования списка к строке.
- */
-export type ToStringCallback<T> = (value: T) => string;
 
 /**
  * Интерфейс однонаправленного связного списка.
@@ -29,8 +18,8 @@ export interface ILinkedList<T> {
   remove: (value: T) => void;
   toArray: () => Array<ILinkedListNode<T>>;
   insertAfter: (value: T, cell: T) => void;
-  find: (target: T, callback?: FindComparatorCallback<T>) => ILinkedListNode<T> | null;
-  forEach: (callback: ForEachCallback<T>) => void;
+  find: (target: T, callback?: CompareFunction<T>) => ILinkedListNode<T> | null;
+  forEach: (callback: (value: ILinkedListNode<T>) => void) => void;
   toString: (callback?: ToStringCallback<T>) => string;
 }
 
@@ -46,9 +35,9 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * @constructor
-   * @param {ComparatorCallback} comparator - Функция, для сравнения элементов.
+   * @param {ComparatorCallback} comparatorFunction - Функция, для сравнения элементов.
    */
-  constructor(comparatorFunction: CompareFunction<T>) {
+  constructor(comparatorFunction?: CompareFunction<T>) {
     this.length = 0;
     this.compare = new Comparator(comparatorFunction);
   }
@@ -119,11 +108,11 @@ export default class LinkedList<T> implements ILinkedList<T> {
    * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
    * @returns {ILinkedListNode | null} - Возвращаемое значение.
    */
-  public find(target: T, callback?: FindComparatorCallback<T>): ILinkedListNode<T> | null {
+  public find(target: T, callback?: CompareFunction<T>): ILinkedListNode<T> | null {
     if (!this.head) return null;
     let current: ILinkedListNode<T> | null = this.head;
     while (current) {
-      if (callback && callback(current.value)) return current;
+      if (callback && callback(current.value, target)) return current;
       if (this.compare && this.compare.equal(current.value, target)) return current;
       current = current.next;
     }
@@ -162,7 +151,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
    * @returns {string}
    */
   public toString(callback?: ToStringCallback<T>): string {
-    return this.toArray().map(node => node.toString()).toString();
+    return this.toArray().map(node => node.toString(callback)).toString();
   }
 
   /**
