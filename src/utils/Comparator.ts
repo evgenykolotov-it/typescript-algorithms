@@ -26,7 +26,7 @@ export default class Comparator<T = number> {
    * @param {number} b - Элемент для сравнения.
    * @returns - Результат сравнения.
    */
-  public static defaultCompareFunction<T>(a: number, b: number): boolean {
+  public static defaultCompareFunction(a: number, b: number): boolean {
     return a - b === 0;
   }
 
