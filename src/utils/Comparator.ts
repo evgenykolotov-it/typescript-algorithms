@@ -5,29 +5,44 @@
 export type CompareFunction<T> = (a: T, b: T) => boolean;
 
 /**
+ * Интерфейс утилиты для сравнения элементов.
+ * @interface IComparator
+ */
+export interface IComparator<T> {
+  equal: CompareFunction<T>;
+}
+
+/**
  * @class
  * @classdesc Служебный класс, предоставляющий полезные функции по сравнению элементов.
+ * @implements {IComparator}
  */
-export default class Comparator<T = number> {
+export default class Comparator<T> implements IComparator<T> {
   private compare: CompareFunction<T>;
 
   /**
    * @constructor
    * @param {CompareFunction} compareFunction - Функция для сравнения элементов.
    */
-  constructor(compareFunction: CompareFunction<T> = (<unknown>Comparator.defaultCompareFunction) as CompareFunction<T>) {
+  constructor(compareFunction: CompareFunction<T> = Comparator.defaultCompareFunction) {
     this.compare = compareFunction;
   }
 
   /**
    * Реализация функции сравнения элементов по умолчанию.
    * @static
-   * @param {number} a - Элемент для сравнения.
-   * @param {number} b - Элемент для сравнения.
+   * @param {*} a - Элемент для сравнения.
+   * @param {*} b - Элемент для сравнения.
    * @returns - Результат сравнения.
    */
-  public static defaultCompareFunction(a: number, b: number): boolean {
-    return a - b === 0;
+  public static defaultCompareFunction<T>(a: T, b: T): boolean {
+    if (typeof a === 'number' && typeof b === 'number') {
+      return a - b === 0;
+    } else if (typeof a === 'bigint' && typeof b === 'bigint') {
+      return a - b === 0n;
+    }
+
+    return a === b;
   }
 
   /**
