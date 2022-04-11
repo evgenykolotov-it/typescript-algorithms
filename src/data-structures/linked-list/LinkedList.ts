@@ -11,16 +11,18 @@ export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
  * Интерфейс однонаправленного связного списка.
  * @interface ILinkedList
  */
-export interface ILinkedList<T> { 
+export interface ILinkedList<T> {
   size: () => number;
-  prepend: (value: T) => void;
-  append: (value: T) => void;
-  remove: (value: T) => void;
-  toArray: () => Array<ILinkedListNode<T>>;
-  insertAfter: (value: T, cell: T) => void;
+  append: (value: T) => ILinkedList<T>;
+  prepend: (value: T) => ILinkedList<T>;
   find: (target: T, callback?: CompareFunction<T>) => ILinkedListNode<T> | null;
-  forEach: (callback: (value: ILinkedListNode<T>) => void) => void;
+  insertAfter: (value: T, cell: T) => ILinkedList<T>;
+  remove: (value: T) => ILinkedList<T>;
+  removeHead: () => ILinkedListNode<T> | null;
+  removeTail: () => ILinkedListNode<T> | null;
+  toArray: () => ILinkedListNode<T>[];
   toString: (callback?: ToStringCallback<T>) => string;
+  forEach: (callback: (value: ILinkedListNode<T>) => void) => void;
 }
 
 /**
@@ -30,8 +32,9 @@ export interface ILinkedList<T> {
  */
 export default class LinkedList<T> implements ILinkedList<T> {
   private length: number;
-  private compare: Comparator<T>;
   private head: ILinkedListNode<T> | null = null;
+  private tail: ILinkedListNode<T> | null = null;
+  private readonly compare: Comparator<T>;
 
   /**
    * @constructor
@@ -43,50 +46,76 @@ export default class LinkedList<T> implements ILinkedList<T> {
   }
 
   /**
-   * Метод для добавления элемента в начало связного списка.
-   * @param {*} value - Значение для добавления в начало связного списка.
+   * 
+   * @param {*} value - Значение для добавления в конец связного списка.
+   * @returns {LinkedList} - Связный список.
    */
-  public prepend(value: T): void {
-    this.head = new LinkedListNode<T>(value, this.head);
+  public append(value: T): LinkedList<T> {
+    const node = new LinkedListNode<T>(value);
+    if (!this.size()) {
+      this.head = this.tail = node;
+    } else {
+      (this.tail as ILinkedListNode<T>).next = node;
+      this.tail = node;
+    }
     this.length++;
+    return this;
   }
 
   /**
-   * Метод для добавления элемента в конец связного списка.
-   * @param {*} value - Значение для добавления в конец связного списка.
+   * Метод для добавления элемента в начало связного списка.
+   * @param {*} value - Значение для добавления в начало связного списка.
+   * @returns {LinkedList} - Связный список.
    */
-  public append(value: T): void {
-    if (!this.head) {
-      this.head = new LinkedListNode<T>(value);
+  public prepend(value: T): ILinkedList<T> {
+    if (!this.size()) {
+      this.head = this.tail = new LinkedListNode(value);
     } else {
-      let current: ILinkedListNode<T> | null = this.head;
-      while (current.next) {
-        current = current?.next;
-      }
-      current.next = new LinkedListNode<T>(value);
+      this.head = new LinkedListNode(value, this.head);
     }
     this.length++;
+    return this;
+  }
+
+  /**
+   * Метод для поиска элемента связного списка, по значению.
+   * @param {*} target - Значение, по которому будет идти поиск элемента.
+   * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
+   * @returns {ILinkedListNode | null} - Возвращаемое значение.
+   */
+  public find(target: T, callback?: CompareFunction<T>): ILinkedListNode<T> | null {
+    if (!this.size()) return null;
+    let current: ILinkedListNode<T> | null = this.head;
+    while (current) {
+      if (callback && callback(current.value, target)) return current;
+      if (this.compare && this.compare.equal(current.value, target)) return current;
+      current = current.next;
+    }
+    return null;
   }
 
   /**
    * Метод для добавления элемента, после указанного.
    * @param {*} cell - Значение, по которому будет произведён поиск элемента. 
-   * @param {*} value - Значение для добавления элемента. 
+   * @param {*} value - Значение для добавления элемента.
+   * @returns {LinkedList} - Связный список.
    */
-  public insertAfter(cell: T, value: T): void {
+  public insertAfter(cell: T, value: T): ILinkedList<T> {
     const afterNode = this.find(cell);
     if (afterNode) {
       afterNode.next = new LinkedListNode<T>(value, afterNode.next);
       this.length++;
     }
+
+    return this;
   }
 
   /**
    * Метод для удаления элемента из связного списка.
    * @param {*} value - Значение для удаления из связного списка.
    */
-  public remove(value: T): void {
-    if (!this.head) return;
+  public remove(value: T): ILinkedList<T> {
+    if (!this.head) return this;
     while (this.head && this.compare.equal(this.head.value, value)) {
       this.head = this.head.next;
       this.length--;
@@ -100,31 +129,55 @@ export default class LinkedList<T> implements ILinkedList<T> {
         current = current?.next;
       }
     }
+    return this;
   }
 
   /**
-   * Метод для поиска элемента связного списка, по значению.
-   * @param {*} target - Значение, по которому будет идти поиск элемента.
-   * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
-   * @returns {ILinkedListNode | null} - Возвращаемое значение.
+   * Метод для удаления первого элемента в связном списке.
+   * @returns {ILinkedListNode | null} - Удаленное значение.
    */
-  public find(target: T, callback?: CompareFunction<T>): ILinkedListNode<T> | null {
-    if (!this.head) return null;
-    let current: ILinkedListNode<T> | null = this.head;
-    while (current) {
-      if (callback && callback(current.value, target)) return current;
-      if (this.compare && this.compare.equal(current.value, target)) return current;
-      current = current.next;
+  public removeHead(): ILinkedListNode<T> | null {
+    if (!this.size()) return null;
+    const deleteHead = this.head;
+    if (this.head?.next) {
+      this.head = this.head.next;
+    } else {
+      this.head = this.tail = null;
     }
-    return null;
+    this.length--;
+    return deleteHead;
+  }
+
+  /**
+   * Метод для удаления последнего элемента в связном списке.
+   * @returns {ILinkedListNode | null} - Удаленное значение.
+   */
+  public removeTail(): ILinkedListNode<T> | null {
+    if (!this.size()) return null;
+    const deleteTail = this.tail;
+    if (this.head === this.tail) {
+      this.head = this.tail = null;
+    } else {
+      let current = this.head;
+      while (current?.next) {
+        if (!current.next.next) {
+          current.next = null;
+        } else {
+          current = current.next;
+        }
+      }
+      this.tail = current;
+    }
+    this.length--;
+    return deleteTail;
   }
 
   /**
    * Метод для преобразования связного списка в массив.
-   * @returns {ILinkedListNode[]}
+   * @returns {ILinkedListNode[]} - Массив из элементов связного списка.
    */
-  public toArray(): Array<ILinkedListNode<T>> {
-    const nodes: Array<ILinkedListNode<T>> = new Array();
+  public toArray(): ILinkedListNode<T>[] {
+    const nodes: ILinkedListNode<T>[] = new Array();
     let currentNode = this.head;
     while (currentNode) {
       nodes.push(currentNode);
@@ -159,6 +212,6 @@ export default class LinkedList<T> implements ILinkedList<T> {
    * @returns - Длинна связного списка.
    */
   public size(): number {
-    return this.length;
+    return this.length ? this.length : 0;
   }
 }
