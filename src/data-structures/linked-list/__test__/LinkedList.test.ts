@@ -17,29 +17,23 @@ describe('Тестирование класса LinkedList', () => {
 
   it('Добавление элемента в конец связного списока', () => {
     const linkedList = new LinkedList();
-    linkedList.append(1);
-    linkedList.append(2);
-    expect(linkedList.toString()).toBe('1,2');
-    expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2]);
-    expect(linkedList.size()).toBe(2);
+    linkedList.append(1).append(2).append(3);
+    expect(linkedList.toString()).toBe('1,2,3');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2, 3]);
+    expect(linkedList.size()).toBe(3);
   });
 
   it('Добавление элемента в начало связного списка', () => {
     const linkedList = new LinkedList();
-    linkedList.append(2);
-    linkedList.prepend(1);
-    expect(linkedList.toString()).toBe('1,2');
-    expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2]);
-    expect(linkedList.size()).toBe(2);
+    linkedList.prepend(1).append(2).prepend(0);
+    expect(linkedList.toString()).toBe('0,1,2');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([0, 1, 2]);
+    expect(linkedList.size()).toBe(3);
   });
 
   it('Добавление элемента в произвольное место связного списка', () => {
     const linkedList = new LinkedList();
-    linkedList.append(1);
-    linkedList.append(2);
-    linkedList.append(4);
-    linkedList.insertAfter(2, 3);
-    linkedList.insertAfter(4, 5);
+    linkedList.append(1).append(2).append(4).insertAfter(2, 3).insertAfter(4, 5);
     expect(linkedList.toString()).toBe('1,2,3,4,5');
     expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2, 3, 4, 5]);
     expect(linkedList.size()).toBe(5);
@@ -47,16 +41,8 @@ describe('Тестирование класса LinkedList', () => {
 
   it('Удаление элемента из связного списка', () => {
     const linkedList = new LinkedList();
-    expect(linkedList.remove(5)).toBeUndefined();
-    linkedList.append(1);
-    linkedList.append(1);
-    linkedList.append(2);
-    linkedList.append(3);
-    linkedList.append(3);
-    linkedList.append(3);
-    linkedList.append(4);
-    linkedList.append(5);
-    linkedList.remove(3)
+    expect(linkedList.remove(5)).toEqual(linkedList);
+    linkedList.append(1).append(1).append(2).append(3).append(3).append(3).append(4).append(5).remove(3);
     expect(linkedList.size()).toBe(5);
     expect(linkedList.toString()).toBe('1,1,2,4,5');
     expect(linkedList.toArray().map(node => node.value)).toEqual([1, 1, 2, 4, 5]);
@@ -78,6 +64,30 @@ describe('Тестирование класса LinkedList', () => {
     expect(linkedList.toArray().map(node => node.value)).toEqual([]);
   });
 
+  it('Удаление элемента с головы связного списка', () => {
+    const linkedList = new LinkedList();
+    linkedList.append(1).append(2).append(3).append(4).append(5).removeHead();
+    expect(linkedList.size()).toBe(4);
+    expect(linkedList.toString()).toBe('2,3,4,5');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([2, 3, 4, 5]);
+    linkedList.removeHead();
+    expect(linkedList.size()).toBe(3);
+    expect(linkedList.toString()).toBe('3,4,5');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([3, 4, 5]);
+  });
+
+  it('Удаление элемента с хвоста связного списка', () => {
+    const linkedList = new LinkedList();
+    linkedList.append(1).append(2).append(3).append(4).append(5).removeTail();
+    expect(linkedList.size()).toBe(4);
+    expect(linkedList.toString()).toBe('1,2,3,4');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2, 3, 4]);
+    linkedList.removeTail();
+    expect(linkedList.size()).toBe(3);
+    expect(linkedList.toString()).toBe('1,2,3');
+    expect(linkedList.toArray().map(node => node.value)).toEqual([1, 2, 3]);
+  });
+
   it('Добавление объектов в связный список', () => {
     const linkedList = new LinkedList<typeof nodeValue1>();
     const nodeValue1 = { value: 1, key: 'key1' };
@@ -93,10 +103,8 @@ describe('Тестирование класса LinkedList', () => {
     linkedList.append(1);
     expect(linkedList.find(1)).toBeDefined();
     expect(linkedList.find(1)?.value).toBe(1);
-    linkedList.append(2)
-    linkedList.append(3);
-    const node = linkedList.find(2);
-    expect(node?.value).toBe(2);
+    linkedList.append(2).append(3);
+    expect(linkedList.find(2)?.value).toBe(2);
     expect(linkedList.find(5)).toBeNull();
   });
 
