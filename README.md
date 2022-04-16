@@ -13,6 +13,7 @@
 `A` - Базовый уровень, `B` - Продвинутый уровень
 
 * `A` [Связный список](src/data-structures/linked-list)
+* `A` [Двунаправленный связный список](src/data-structures/double-linked-list)
 
 ## Алгоритмы
 
