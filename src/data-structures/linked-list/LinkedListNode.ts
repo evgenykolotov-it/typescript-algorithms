@@ -5,8 +5,8 @@
 export type ToStringCallback<T> = (value: T) => string;
 
 /**
- * Интерфейс одного элемента однонаправленного связного списка.
  * @interface ILinkedListNode
+ * Интерфейс одного элемента однонаправленного связного списка.
  */
 export interface ILinkedListNode<T> {
   value: T;

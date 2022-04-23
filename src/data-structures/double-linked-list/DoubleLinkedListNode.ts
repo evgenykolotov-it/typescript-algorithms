@@ -5,8 +5,8 @@
  export type ToStringCallback<T> = (value: T) => string;
 
  /**
-  * Интерфейс одного элемента двунаправленного связного списка.
   * @interface IDoubleLinkedListNode
+  * Интерфейс одного элемента двунаправленного связного списка.
   */
  export interface IDoubleLinkedListNode<T> {
    value: T;
