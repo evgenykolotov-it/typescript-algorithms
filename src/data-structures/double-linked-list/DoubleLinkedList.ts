@@ -9,8 +9,8 @@ import DoubleLinkedListNode, { IDoubleLinkedListNode, ToStringCallback } from ".
 export type ForEachCallback<T> = (value: IDoubleLinkedListNode<T>) => void;
 
 /**
- * Интерфейс двунаправленного связного списка.
  * @interface IDoubleLinkedList
+ * Интерфейс двунаправленного связного списка.
  */
 export interface IDoubleLinkedList<T> {
   size: () => number;

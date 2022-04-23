@@ -8,8 +8,8 @@ import Comparator, { CompareFunction } from "../../utils/Comparator";
 export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
 
 /**
- * Интерфейс однонаправленного связного списка.
  * @interface ILinkedList
+ * Интерфейс однонаправленного связного списка.
  */
 export interface ILinkedList<T> {
   size: () => number;
