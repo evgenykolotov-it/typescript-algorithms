@@ -1,12 +1,12 @@
 /**
- * @type {ToStringCallback}
  * Тип функции, передаваемой для преобразования списка к строке.
+ * @type {ToStringCallback}
  */
  export type ToStringCallback<T> = (value: T) => string;
 
 /**
- * @interface IStack
  * Интерфейс структуры данных стек.
+ * @interface IStack
  */
 export interface IStack<T> {
   peek: () => T | undefined;

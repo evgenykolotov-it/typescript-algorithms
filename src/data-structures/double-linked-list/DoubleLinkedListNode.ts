@@ -1,12 +1,12 @@
 /**
- * @type {ToStringCallback}
  * Тип функции, передаваемой для преобразования списка к строке.
+ * @type {ToStringCallback}
  */
  export type ToStringCallback<T> = (value: T) => string;
 
  /**
-  * @interface IDoubleLinkedListNode
   * Интерфейс одного элемента двунаправленного связного списка.
+  * @interface IDoubleLinkedListNode
   */
  export interface IDoubleLinkedListNode<T> {
    value: T;

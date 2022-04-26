@@ -1,16 +1,15 @@
-
 import Comparator, { CompareFunction } from "../../utils/Comparator";
 import DoubleLinkedListNode, { IDoubleLinkedListNode, ToStringCallback } from "./DoubleLinkedListNode";
 
 /**
- * @type {ForEachCallback}
  * Тип функции, вызываемой при переборе связного списка.
+ * @type {ForEachCallback}
  */
 export type ForEachCallback<T> = (value: IDoubleLinkedListNode<T>) => void;
 
 /**
- * @interface IDoubleLinkedList
  * Интерфейс двунаправленного связного списка.
+ * @interface IDoubleLinkedList
  */
 export interface IDoubleLinkedList<T> {
   size: () => number;
