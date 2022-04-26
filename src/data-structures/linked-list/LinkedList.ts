@@ -2,14 +2,14 @@ import LinkedListNode, { ILinkedListNode, ToStringCallback } from "./LinkedListN
 import Comparator, { CompareFunction } from "../../utils/Comparator";
 
 /**
- * @type {ForEachCallback}
  * Тип функции, вызываемой при переборе связного списка.
+ * @type {ForEachCallback}
  */
 export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
 
 /**
- * @interface ILinkedList
  * Интерфейс однонаправленного связного списка.
+ * @interface ILinkedList
  */
 export interface ILinkedList<T> {
   size: () => number;
@@ -46,7 +46,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
   }
 
   /**
-   * 
+   * Метод для добавления элемента в конец связного списка.
    * @param {*} value - Значение для добавления в конец связного списка.
    * @returns {LinkedList} - Связный список.
    */
