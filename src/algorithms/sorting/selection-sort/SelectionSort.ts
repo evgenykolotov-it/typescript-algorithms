@@ -1,13 +1,15 @@
 import Sort from "../Sort";
 
-export default class BubbleSort extends Sort {
+export default class SelectionSort extends Sort {
   public static sort(array: number[]): void {
     for (let partIndex = array.length - 1; partIndex > 0; partIndex--) {
-      for (let i = 0; i < partIndex; i++) {
-        if (BubbleSort.comparator(array[i], array[i + 1]) > 0) {
-          BubbleSort.swap(array, i, i + 1);
+      let largestAt = 0;
+      for (let i = 0; i <= partIndex; i++) {
+        if (SelectionSort.comparator(array[i], array[largestAt]) > 0) {
+          largestAt = i;
         }
       }
+      SelectionSort.swap(array, largestAt, partIndex);
     }
   }
 
