@@ -1,7 +1,7 @@
 import Sort from "../Sort";
 
-export default class BubbleSort implements Sort {
-  public sort(array: number[]): void {
+export default class BubbleSort extends Sort {
+  public static sort(array: number[]): void {
     for (let partIndex = array.length - 1; partIndex > 0; partIndex--) {
       for (let i = 0; i < partIndex; i++) {
         if (BubbleSort.comparator(array[i], array[i + 1]) > 0) {

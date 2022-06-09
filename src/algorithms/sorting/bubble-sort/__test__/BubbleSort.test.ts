@@ -1,12 +1,12 @@
 import BubbleSort from '../BubbleSort';
 import SortTester from '../../SortTester';
 
-describe('BubbleSort', () => {
-  it('should sort array', () => {
+describe('Тестирование алгоритма Пузырькова сортировка', () => {
+  it('Тестирование сортировки массива с положительными числами', () => {
     SortTester.testSort(BubbleSort);
   });
 
-  it('should sort negative numbers', () => {
+  it('Тестирование сортировки массива с негативными числами', () => {
     SortTester.testNegativeNumbersSort(BubbleSort);
   });
 });

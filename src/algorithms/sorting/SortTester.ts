@@ -9,44 +9,41 @@ export const negativeArrSorted = [-10, -7, -3, -1, 0, 2, 3, 5, 13, 20];
 
 export default class SortTester {
   public static testSort(SortingClass: typeof Sort): void {
-    const sorter = new SortingClass();
-
     const arr: number[] = [];
-    sorter.sort(arr);
+    SortingClass.sort(arr);
     expect(arr).toEqual([]);
 
     const arr1 = [1];
-    sorter.sort(arr1);
+    SortingClass.sort(arr1);
     expect(arr1).toEqual([1]);
 
     const arr2 = [1, 2];
-    sorter.sort(arr2);
+    SortingClass.sort(arr2);
     expect(arr2).toEqual([1, 2]);
 
     const arr3 = [2, 1];
-    sorter.sort(arr3)
+    SortingClass.sort(arr3)
     expect(arr3).toEqual([1, 2]);
 
     const arr4 = [3, 4, 2, 1, 0, 0, 4, 3, 4, 2];
-    sorter.sort(arr4)
+    SortingClass.sort(arr4)
     expect(arr4).toEqual([0, 0, 1, 2, 2, 3, 3, 4, 4, 4]);
 
-    sorter.sort(sortedArr)
+    SortingClass.sort(sortedArr)
     expect(sortedArr).toEqual(sortedArr);
 
-    sorter.sort(reverseArr)
+    SortingClass.sort(reverseArr)
     expect(reverseArr).toEqual(sortedArr);
 
-    sorter.sort(notSortedArr)
+    SortingClass.sort(notSortedArr)
     expect(notSortedArr).toEqual(sortedArr);
 
-    sorter.sort(equalArr)
+    SortingClass.sort(equalArr)
     expect(equalArr).toEqual(equalArr);
   }
 
   public static testNegativeNumbersSort(SortingClass: typeof Sort) {
-    const sorter = new SortingClass();
-    sorter.sort(negativeArr)
+    SortingClass.sort(negativeArr)
     expect(negativeArr).toEqual(negativeArrSorted);
   }
 }
