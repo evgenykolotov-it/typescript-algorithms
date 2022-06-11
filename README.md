@@ -33,6 +33,7 @@
 * `A` [Сортировка пузырьком](src/algorithms/sorting/bubble-sort)
 * `A` [Сортировка выбором](src/algorithms/sorting/selection-sort)
 * `A` [Сортировка вставками](src/algorithms/sorting/insertion-sort)
+* `B` [Сортировка подсчётом](src/algorithms/sorting/counting-sort)
 * `B` [Сортировка слиянием](src/algorithms/sorting/merge-sort)
 * `B` [Быстрая сортировка](src/algorithms/sorting/quick-sort)
 
@@ -71,6 +72,7 @@
 | **Сортировка пузырьком**   | n             | n<sup>2</sup>  | n<sup>2</sup> | 1      | Да           |             |
 | **Сортировка выбором**     | n<sup>2</sup> | n<sup>2</sup>  | n<sup>2</sup> | 1      | Нет          |             |
 | **Сортировка вставками**   | n             | n<sup>2</sup>  | n<sup>2</sup> | 1      | Да           |             |
+| **Сортировка подсчётом**   | n + r         | n + r          | n + r         | n + r  | Да           | r — наибольшее число в массиве |
 | **Сортировка слиянием**    | n&nbsp;log(n) | n&nbsp;log(n)  | n&nbsp;log(n) | n      | Да           |             |
 | **Быстрая сортировка**     | n&nbsp;log(n) | n&nbsp;log(n)  | n<sup>2</sup> | log(n) | Нет          | Быстрая сортировка обычно выполняется с использованием O(log(n)) дополнительной памяти |
 
