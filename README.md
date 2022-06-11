@@ -16,6 +16,7 @@
 * `A` [Двунаправленный связный список](src/data-structures/double-linked-list)
 * `A` [Стек](src/data-structures/stack)
 * `A` [Очередь](src/data-structures/queue)
+* `A` [Хеш-табица](src/data-structures/hash-table)
 
 ## Алгоритмы
 
@@ -64,6 +65,7 @@
 | **Связный список**         | n         | n         | 1         | n         |             |
 | **Стек**                   | n         | n         | 1         | 1         |             |
 | **Очередь**                | n         | n         | 1         | 1         |             |
+| **Hash Table**             | -         | n         | n         | n         | In case of perfect hash function costs would be O(1) |
 
 ### Сложности алгоритмов сортировки
 
@@ -74,5 +76,6 @@
 | **Сортировка вставками**   | n             | n<sup>2</sup>  | n<sup>2</sup> | 1      | Да           |             |
 | **Сортировка подсчётом**   | n + r         | n + r          | n + r         | n + r  | Да           | r — наибольшее число в массиве |
 | **Сортировка слиянием**    | n&nbsp;log(n) | n&nbsp;log(n)  | n&nbsp;log(n) | n      | Да           |             |
-| **Быстрая сортировка**     | n&nbsp;log(n) | n&nbsp;log(n)  | n<sup>2</sup> | log(n) | Нет          | Быстрая сортировка обычно выполняется с использованием O(log(n)) дополнительной памяти |
+| **Быстрая сортировка**     | n&nbsp;log(n) | n&nbsp;log(n)  | n<sup>2</sup> | log(n) | Нет          | Быстрая сортировка обычно 
+выполняется с использованием O(log(n)) дополнительной памяти |
 

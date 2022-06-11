@@ -15,7 +15,7 @@ export interface ILinkedList<T> {
   size: () => number;
   append: (value: T) => ILinkedList<T>;
   prepend: (value: T) => ILinkedList<T>;
-  find: (target: T, callback?: CompareFunction<T>) => ILinkedListNode<T> | null;
+  find: (target: any, callback?: CompareFunction<any>) => ILinkedListNode<T> | null;
   insertAfter: (value: T, cell: T) => ILinkedList<T>;
   remove: (value: T) => ILinkedList<T>;
   removeHead: () => ILinkedListNode<T> | null;
@@ -83,7 +83,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
    * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
    * @returns {ILinkedListNode | null} - Возвращаемое значение.
    */
-  public find(target: T, callback?: CompareFunction<T>): ILinkedListNode<T> | null {
+  public find(target: any, callback?: CompareFunction<any>): ILinkedListNode<T> | null {
     if (!this.size()) return null;
     let current: ILinkedListNode<T> | null = this.head;
     while (current) {
