@@ -26,6 +26,7 @@ export default class Stack<T> implements IStack<T> {
 
   /**
    * Метод, возвращающий последний добавленный элемент в стек.
+   * @public
    * @returns {T} - Последний элемент стека.
    */
   public peek(): T | undefined {
@@ -34,6 +35,7 @@ export default class Stack<T> implements IStack<T> {
 
   /**
    * Метод для добавления элемента в стек.
+   * @public
    * @param {T} value - Значение, для добавления в стек.
    */
   public push(value: T): void {
@@ -42,6 +44,7 @@ export default class Stack<T> implements IStack<T> {
 
   /**
    * Метод для удаления элемента из стека.
+   * @public
    * @returns {T} - Значение удаленного элемента стека.
    */
   public pop(): T {
@@ -50,6 +53,7 @@ export default class Stack<T> implements IStack<T> {
 
   /**
    * Метод для преобразования стека в массив.
+   * @public
    * @returns {Array<T>} - Итоговый массив, после преобразования из стека.
    */
   public toArray(): Array<T> {
@@ -57,7 +61,8 @@ export default class Stack<T> implements IStack<T> {
   }
 
   /**
-   * Метод для преодбразования стека в строку
+   * Метод для преодбразования стека в строку.
+   * @public
    * @param {ToStringCallback<T>} callback - Функция для преобразования к строке.
    * @returns {string} - Итоговая строка.
    */

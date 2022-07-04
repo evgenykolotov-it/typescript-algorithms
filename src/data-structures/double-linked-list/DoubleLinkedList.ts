@@ -1,4 +1,3 @@
-import Comparator, { CompareFunction } from "../../utils/Comparator";
 import DoubleLinkedListNode, { IDoubleLinkedListNode, ToStringCallback } from "./DoubleLinkedListNode";
 
 /**
@@ -8,6 +7,12 @@ import DoubleLinkedListNode, { IDoubleLinkedListNode, ToStringCallback } from ".
 export type ForEachCallback<T> = (value: IDoubleLinkedListNode<T>) => void;
 
 /**
+ * Тип функции, используемой для поиска элемента связного списка.
+ * @type {CompareFunction}
+ */
+ export type CompareFunction<T> = (node: T) => boolean;
+
+/**
  * Интерфейс двунаправленного связного списка.
  * @interface IDoubleLinkedList
  */
@@ -15,9 +20,9 @@ export interface IDoubleLinkedList<T> {
   size: () => number;
   append: (value: T) => IDoubleLinkedList<T>;
   prepend: (value: T) => IDoubleLinkedList<T>;
-  find: (target: T, callback?: CompareFunction<T>) => IDoubleLinkedListNode<T> | null;
-  insertAfter: (value: T, cell: T) => IDoubleLinkedList<T>;
-  remove: (value: T) => IDoubleLinkedList<T>;
+  find: (callback: CompareFunction<T>) => IDoubleLinkedListNode<T> | null;
+  insertAfter: (value: T, callback: CompareFunction<T>) => IDoubleLinkedList<T>;
+  remove: (callback: CompareFunction<T>) => IDoubleLinkedList<T>;
   removeHead: () => IDoubleLinkedListNode<T> | null;
   removeTail: () => IDoubleLinkedListNode<T> | null;
   toArray: () => IDoubleLinkedListNode<T>[];
@@ -31,22 +36,13 @@ export interface IDoubleLinkedList<T> {
  * @implements {IDoubleLinkedList}
  */
 export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
-  private length: number;
+  private length: number = 0;
   private head: IDoubleLinkedListNode<T> | null = null;
   private tail: IDoubleLinkedListNode<T> | null = null;
-  private readonly compare: Comparator<T>;
 
   /**
-   * @constructor
-   * @param {ComparatorCallback} comparatorFunction - Функция, для сравнения элементов.
-   */
-  constructor(comparatorFunction?: CompareFunction<T>) {
-    this.length = 0;
-    this.compare = new Comparator(comparatorFunction);
-  }
-
-  /**
-   * 
+   * Метод для добавления элемента в конец связного списка.
+   * @public
    * @param {*} value - Значение для добавления в конец связного списка.
    * @returns {IDoubleLinkedList} - Связный список.
    */
@@ -65,6 +61,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для добавления элемента в начало связного списка.
+   * @public
    * @param {*} value - Значение для добавления в начало связного списка.
    * @returns {IDoubleLinkedList} - Связный список.
    */
@@ -83,16 +80,15 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для поиска элемента связного списка, по значению.
-   * @param {*} target - Значение, по которому будет идти поиск элемента.
-   * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
+   * @public
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
    * @returns {IDoubleLinkedListNode | null} - Возвращаемое значение.
    */
-  public find(target: T, callback?: CompareFunction<T>): IDoubleLinkedListNode<T> | null {
+  public find(callback: CompareFunction<T>): IDoubleLinkedListNode<T> | null {
     if (!this.size()) return null;
     let current: IDoubleLinkedListNode<T> | null = this.head;
     while (current) {
-      if (callback && callback(current.value, target)) return current;
-      if (this.compare && this.compare.equal(current.value, target)) return current;
+      if (callback(current.value)) return current;
       current = current.next;
     }
     return null;
@@ -100,12 +96,13 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для добавления элемента, после указанного.
-   * @param {*} cell - Значение, по которому будет произведён поиск элемента. 
+   * @public
    * @param {*} value - Значение для добавления элемента.
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
    * @returns {IDoubleLinkedList} - Связный список.
    */
-  public insertAfter(cell: T, value: T): IDoubleLinkedList<T> {
-    const afterNode = this.find(cell);
+  public insertAfter(value: T, callback: CompareFunction<T>): IDoubleLinkedList<T> {
+    const afterNode = this.find(callback);
     if (afterNode) {
       afterNode.next = new DoubleLinkedListNode<T>(value, afterNode.next, afterNode);
       this.length++;
@@ -115,17 +112,19 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для удаления элемента из связного списка.
-   * @param {*} value - Значение для удаления из связного списка.
+   * @public
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
+   * @returns {IDoubleLinkedList} - Связный список.
    */
-  public remove(value: T): IDoubleLinkedList<T> {
+  public remove(callback: CompareFunction<T>): IDoubleLinkedList<T> {
     if (!this.size()) return this;
-    while (this.head && this.compare.equal(this.head.value, value)) {
+    while (this.head &&  callback(this.head.value)) {
       this.head = this.head.next;
       this.length--;
     }
     let current: IDoubleLinkedListNode<T> | null = this.head;
     while (current?.next) {
-      if (this.compare.equal(value, current.next.value)) {
+      if (callback(current.next.value)) {
         current.next = current.next.next;
         this.length--;
       } else {
@@ -137,6 +136,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для удаления первого элемента в связном списке.
+   * @public
    * @returns {IDoubleLinkedListNode | null} - Удаленное значение.
    */
   public removeHead(): IDoubleLinkedListNode<T> | null {
@@ -154,6 +154,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для удаления последнего элемента в связном списке.
+   * @public
    * @returns {IDoubleLinkedListNode | null} - Удаленное значение.
    */
   public removeTail(): IDoubleLinkedListNode<T> | null {
@@ -171,6 +172,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для преобразования связного списка в массив.
+   * @public
    * @returns {IDoubleLinkedListNode[]} - Массив из элементов связного списка.
    */
   public toArray(): IDoubleLinkedListNode<T>[] {
@@ -185,6 +187,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для перебора связного списка с выполнением функции для каждого элемента.
+   * @public
    * @param {ForEachCallback} callback - Функция для выполнения на элементе.
    */
   public forEach(callback: ForEachCallback<T>): void {
@@ -197,6 +200,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод для преобразования связного списка к строке.
+   * @public
    * @param {ToStringCallback} callback - Функция для преобразования к строке.
    * @returns {string}
    */
@@ -206,6 +210,7 @@ export default class DoubleLinkedList<T> implements IDoubleLinkedList<T> {
 
   /**
    * Метод, возвращающий текущую длинну связного списка.
+   * @public
    * @returns - Длинна связного списка.
    */
   public size(): number {

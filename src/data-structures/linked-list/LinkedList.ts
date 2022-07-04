@@ -1,11 +1,16 @@
 import LinkedListNode, { ILinkedListNode, ToStringCallback } from "./LinkedListNode";
-import Comparator, { CompareFunction } from "../../utils/Comparator";
 
 /**
  * Тип функции, вызываемой при переборе связного списка.
  * @type {ForEachCallback}
  */
-export type ForEachCallback<T> = (value: ILinkedListNode<T>) => void;
+export type ForEachCallback<T> = (node: ILinkedListNode<T>) => void;
+
+/**
+ * Тип функции, используемой для поиска элемента связного списка.
+ * @type {CompareFunction}
+ */
+export type CompareFunction<T> = (node: T) => boolean;
 
 /**
  * Интерфейс однонаправленного связного списка.
@@ -15,9 +20,9 @@ export interface ILinkedList<T> {
   size: () => number;
   append: (value: T) => ILinkedList<T>;
   prepend: (value: T) => ILinkedList<T>;
-  find: (target: any, callback?: CompareFunction<any>) => ILinkedListNode<T> | null;
-  insertAfter: (value: T, cell: T) => ILinkedList<T>;
-  remove: (value: T) => ILinkedList<T>;
+  find: (callback: CompareFunction<T>) => ILinkedListNode<T> | null;
+  insertAfter: (value: T, callback: CompareFunction<T>) => ILinkedList<T>;
+  remove: (callback: CompareFunction<T>) => ILinkedList<T>;
   removeHead: () => ILinkedListNode<T> | null;
   removeTail: () => ILinkedListNode<T> | null;
   toArray: () => ILinkedListNode<T>[];
@@ -31,22 +36,13 @@ export interface ILinkedList<T> {
  * @implements {ILinkedList}
  */
 export default class LinkedList<T> implements ILinkedList<T> {
-  private length: number;
+  private length: number = 0;
   private head: ILinkedListNode<T> | null = null;
   private tail: ILinkedListNode<T> | null = null;
-  private readonly compare: Comparator<T>;
-
-  /**
-   * @constructor
-   * @param {ComparatorCallback} comparatorFunction - Функция, для сравнения элементов.
-   */
-  constructor(comparatorFunction?: CompareFunction<T>) {
-    this.length = 0;
-    this.compare = new Comparator(comparatorFunction);
-  }
 
   /**
    * Метод для добавления элемента в конец связного списка.
+   * @public
    * @param {*} value - Значение для добавления в конец связного списка.
    * @returns {LinkedList} - Связный список.
    */
@@ -64,6 +60,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для добавления элемента в начало связного списка.
+   * @public
    * @param {*} value - Значение для добавления в начало связного списка.
    * @returns {LinkedList} - Связный список.
    */
@@ -79,16 +76,15 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для поиска элемента связного списка, по значению.
-   * @param {*} target - Значение, по которому будет идти поиск элемента.
-   * @param {FindComparatorCallback} callback - Функция, по которой будет идти сравнение.
-   * @returns {ILinkedListNode | null} - Возвращаемое значение.
+   * @public
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
+   * @returns {ILinkedListNode | null} - Возвращаемое значение. 
    */
-  public find(target: any, callback?: CompareFunction<any>): ILinkedListNode<T> | null {
+  public find(callback: CompareFunction<T>): ILinkedListNode<T> | null {
     if (!this.size()) return null;
     let current: ILinkedListNode<T> | null = this.head;
     while (current) {
-      if (callback && callback(current.value, target)) return current;
-      if (this.compare && this.compare.equal(current.value, target)) return current;
+      if (callback(current.value)) return current;
       current = current.next;
     }
     return null;
@@ -96,12 +92,13 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для добавления элемента, после указанного.
-   * @param {*} cell - Значение, по которому будет произведён поиск элемента. 
+   * @public
    * @param {*} value - Значение для добавления элемента.
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
    * @returns {LinkedList} - Связный список.
    */
-  public insertAfter(cell: T, value: T): ILinkedList<T> {
-    const afterNode = this.find(cell);
+  public insertAfter(value: T, callback: CompareFunction<T>): ILinkedList<T> {
+    const afterNode = this.find(callback);
     if (afterNode) {
       afterNode.next = new LinkedListNode<T>(value, afterNode.next);
       this.length++;
@@ -112,17 +109,19 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для удаления элемента из связного списка.
-   * @param {*} value - Значение для удаления из связного списка.
+   * @public
+   * @param {CompareFunction} callback - Функция, по которой будет идти сравнение.
+   * @returns {LinkedList} - Связный список.
    */
-  public remove(value: T): ILinkedList<T> {
-    if (!this.head) return this;
-    while (this.head && this.compare.equal(this.head.value, value)) {
+  public remove(callback: CompareFunction<T>): ILinkedList<T> {
+    if (!this.size()) return this;
+    while (this.head && callback(this.head.value)) {
       this.head = this.head.next;
       this.length--;
     }
     let current: ILinkedListNode<T> | null = this.head;
     while (current?.next) {
-      if (this.compare.equal(value, current.next.value)) {
+      if (callback(current.next.value)) {
         current.next = current.next.next;
         this.length--;
       } else {
@@ -134,6 +133,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для удаления первого элемента в связном списке.
+   * @public
    * @returns {ILinkedListNode | null} - Удаленное значение.
    */
   public removeHead(): ILinkedListNode<T> | null {
@@ -150,6 +150,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для удаления последнего элемента в связном списке.
+   * @public
    * @returns {ILinkedListNode | null} - Удаленное значение.
    */
   public removeTail(): ILinkedListNode<T> | null {
@@ -174,6 +175,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для преобразования связного списка в массив.
+   * @public
    * @returns {ILinkedListNode[]} - Массив из элементов связного списка.
    */
   public toArray(): ILinkedListNode<T>[] {
@@ -188,6 +190,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для перебора связного списка с выполнением функции для каждого элемента.
+   * @public
    * @param {ForEachCallback} callback - Функция для выполнения на элементе.
    */
   public forEach(callback: ForEachCallback<T>): void {
@@ -200,6 +203,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод для преобразования связного списка к строке.
+   * @public
    * @param {ToStringCallback} callback - Функция для преобразования к строке.
    * @returns {string}
    */
@@ -209,6 +213,7 @@ export default class LinkedList<T> implements ILinkedList<T> {
 
   /**
    * Метод, возвращающий текущую длинну связного списка.
+   * @public
    * @returns - Длинна связного списка.
    */
   public size(): number {
