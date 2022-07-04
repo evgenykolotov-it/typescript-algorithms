@@ -61,7 +61,7 @@ export default class HashTable<T> implements IHashTable<T> {
     const keyHash = this.hash(key);
     this.keys[key] = keyHash;
     const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find(key, (nodeValue: IHashTableNode<T>, key) => nodeValue.key === key)
+    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
     if (!node) {
       bucketLinkedList.append({ key, value });
     } else {
@@ -79,9 +79,9 @@ export default class HashTable<T> implements IHashTable<T> {
     const keyHash = this.hash(key);
     delete this.keys[key];
     const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find(key, (nodeValue: IHashTableNode<T>, key) => nodeValue.key === key)
+    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
     if (node) {
-      bucketLinkedList.remove(node.value);
+      bucketLinkedList.remove((nodeValue: IHashTableNode<T>) => nodeValue.key === node.value.key);
       return;
     }
 
@@ -97,7 +97,7 @@ export default class HashTable<T> implements IHashTable<T> {
   public get(key: string): T | null {
     const keyHash = this.hash(key);
     const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find(key, (nodeValue: IHashTableNode<T>, key) => nodeValue.key === key)
+    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
 
     return node ? node.value.value : null;
   }
@@ -114,6 +114,7 @@ export default class HashTable<T> implements IHashTable<T> {
 
   /**
    * Получение массива ключей из Хэш таблицы.
+   * @public
    * @returns {string[]}
    */
   public getKeys(): string[] {
@@ -122,6 +123,7 @@ export default class HashTable<T> implements IHashTable<T> {
 
   /**
    * Получение массива значений из Хэш таблицы.
+   * @public
    * @returns {Array<T>}
    */
   public getValues(): Array<T> {
