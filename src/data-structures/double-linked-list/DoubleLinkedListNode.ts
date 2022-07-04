@@ -43,6 +43,7 @@
  
    /**
     * Метод для преобразования связного списка к строке.
+    * @public
     * @param {ToStringCallback} callback - Функция для преобразования к строке.
     * @returns {string}
     */
