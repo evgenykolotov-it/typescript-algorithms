@@ -21,6 +21,7 @@ export default class Queue<T> implements IQueue<T> {
 
   /**
    * Метод для добавления значения в очередь.
+   * @public
    * @param {T} value - Значение, для добавления в очередь.
    */
   public enqueue(value: T): void {
@@ -29,6 +30,7 @@ export default class Queue<T> implements IQueue<T> {
 
   /**
    * Метод для удаления элемента из очереди.
+   * @public
    * @returns {T | null}
    */
   public dequeue(): T | null {
@@ -36,6 +38,12 @@ export default class Queue<T> implements IQueue<T> {
     return removedHead ? removedHead.value : null;
   }
 
+  /**
+   * Метод для преобразования связного списка к строке.
+   * @public
+   * @param {ToStringCallback} callback - Функция для преобразования к строке.
+   * @returns {string}
+   */
   public toString(callback?: ToStringCallback<T>): string {
     return this.linkedList.toString(callback);
   }
