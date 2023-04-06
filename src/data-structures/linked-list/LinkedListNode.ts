@@ -1,45 +1,27 @@
-/**
- * Тип функции, передаваемой для преобразования списка к строке.
- * @type {ToStringCallback}
- */
-export type ToStringCallback<T> = (value: T) => string;
-
-/**
- * Интерфейс одного элемента однонаправленного связного списка.
- * @interface ILinkedListNode
- */
+/** Тип одного элемента односвязного списка */
 export interface ILinkedListNode<T> {
+  /** Полезная нагрузка */
   value: T;
+  /** Указатель на следующий элемент */
   next: ILinkedListNode<T> | null;
-  toString: (callback?: ToStringCallback<T>) => string;
+  /** Метод приведения элемента к строке */
+  toString: (callback?: (value: T) => string) => string;
 }
 
-/**
- * @class
- * @classdesc Класс, реализующий интерфейс элемента однонаправленного связного списка.
- * @implements {ILinkedListNode}
- */
+/** Элемент односвязного списка */
 export default class LinkedListNode<T> implements ILinkedListNode<T> {
+  /** Полезная нагрузка */
   public value: T;
+  /** Указатель на следующий элемент */
   public next: ILinkedListNode<T> | null;
 
-  /**
-   * @constructor
-   * @param {*} value - Полезные данные, содержащиеся в элементе.
-   * @param {ILinkedListNode | null} next - Ссылка на следующий элемент связного списка.
-   */
   constructor(value: T, next: ILinkedListNode<T> | null = null) {
     this.value = value;
     this.next = next;
   }
 
-  /**
-   * Метод для преобразования связного списка к строке.
-   * @public
-   * @param {ToStringCallback} callback - Функция для преобразования к строке.
-   * @returns {string}
-   */
-  public toString(callback?: ToStringCallback<T>): string {
+  /** Метод приведения элемента к строке */
+  public toString(callback?: (value: T) => string): string {
     return callback ? callback(this.value) : `${this.value}`;
   }
 }
