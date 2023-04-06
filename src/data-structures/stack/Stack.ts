@@ -1,73 +1,44 @@
-/**
- * Тип функции, передаваемой для преобразования списка к строке.
- * @type {ToStringCallback}
- */
- export type ToStringCallback<T> = (value: T) => string;
-
-/**
- * Интерфейс структуры данных стек.
- * @interface IStack
- */
+/** Тип структуры данных "Стек" */
 export interface IStack<T> {
-  peek: () => T | undefined;
-  pop: () => T;
-  push: (value: T) => void;
+  /** Удаление из стека */
+  pop: () => T | null;
+  /** Приведение стека к массиву */
   toArray: () => Array<T>;
-  toString: (callback?: ToStringCallback<T>) => string;
+  /** Добавление в стек */
+  push: (value: T) => void;
+  /** Получение элемента из стека */
+  peek: () => T | null;
+  /** Приведение стека к строке */
+  toString: (callback?: (node: T) => string) => string;
 }
 
-/**
- * @class
- * @classdesc Класс, реализующий структуру данных стек.
- * @implements {IStack}
- */
+/** Структура данных "Стек" */
 export default class Stack<T> implements IStack<T> {
+  /** Массив для хранения стека */
   private readonly list: Array<T> = [];
 
-  /**
-   * Метод, возвращающий последний добавленный элемент в стек.
-   * @public
-   * @returns {T} - Последний элемент стека.
-   */
-  public peek(): T | undefined {
-    return this.list.at(-1) as T | undefined;
+  /** Получение элемента из стека */
+  public peek(): T | null {
+    return this.list.at(-1) ?? null;
   }
 
-  /**
-   * Метод для добавления элемента в стек.
-   * @public
-   * @param {T} value - Значение, для добавления в стек.
-   */
+  /** Добавление элемента в стек */
   public push(value: T): void {
     this.list.push(value);
   }
 
-  /**
-   * Метод для удаления элемента из стека.
-   * @public
-   * @returns {T} - Значение удаленного элемента стека.
-   */
-  public pop(): T {
-    return this.list.pop() as T;
+  /** Удаление элемента из стека */
+  public pop(): T | null {
+    return this.list.pop() ?? null;
   }
 
-  /**
-   * Метод для преобразования стека в массив.
-   * @public
-   * @returns {Array<T>} - Итоговый массив, после преобразования из стека.
-   */
+  /** Приведение стека к массиву */
   public toArray(): Array<T> {
     return this.list;
   }
 
-  /**
-   * Метод для преодбразования стека в строку.
-   * @public
-   * @param {ToStringCallback<T>} callback - Функция для преобразования к строке.
-   * @returns {string} - Итоговая строка.
-   */
-  public toString(callback?: ToStringCallback<T>): string {
+  /** Приведение стека к строке */
+  public toString(callback?: (node: T) => string): string {
     return this.list.map(node => callback ? callback(node) : `${node}`).toString();
   }
 }
-

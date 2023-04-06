@@ -1,151 +1,104 @@
-import LinkedList, { ILinkedList } from '../linked-list/LinkedList';
+import LinkedList, { ILinkedList } from "../linked-list/LinkedList";
 
-/**
- * Интерфейс лбъекта для хранения ключей Хэш таблицы.
- * @interface IKeys
- */
-export interface IKeys {
-  [key: string]: number;
-}
-
-/**
- * Интерфейс узла для связного списка в Хэш таблице.
- * @interface IHashTableNode
- */
-export interface IHashTableNode<T> {
-  key: string;
-  value: T;
-}
-
-/**
- * Интерфейс структуры данных "Хэш таблицы".
- * @interface IHashTable
- */
+/** Тип структуры данных "Хэш-таблица" */
 export interface IHashTable<T> {
-  set: (key: string, value: T) => void;
-  delete: (key: string) => void;
-  get: (key: string) => T | null;
-  has: (key: string) => boolean;
-  getKeys: () => Array<string>;
-  getValues: () => Array<T>;
+    /** Получение данных */
+    get: (key: string) => T | null;
+    /** Установка данных */
+    set: (key: string, value: T) => void;
+    /** Удаление данных */
+    delete: (key: string) => void;
+    /** Проверка наличия данных */
+    has: (key: string) => boolean;
+    /** Привидение к массиву ключей */
+    getKeys: () => Array<string>;
+    /** Привидение к массиву значений */
+    getValues: () => Array<T>;
 }
 
-/**
- * @class
- * @name HashTable
- * @implements {IHashTable}
- * @classdesc Класс, реализующий структуру данных "Хэш-таблица".
- */
+/** Тип элемента связного списка */
+export interface IHashTableNode<T> {
+    /** Уникальный ключ */
+    key: string;
+    /** Полезная нагрузка */
+    value: T;
+}
+
+/** Структура данных "Хэш-таблица" */
 export default class HashTable<T> implements IHashTable<T> {
-  private static readonly DEFAULT_TABLE_SIZE: number = 32;
-  private buckets: ILinkedList<IHashTableNode<T>>[];
-  private keys: IKeys = {};
+    /** Массив связных списков для хранения данных */
+    private buckets: ILinkedList<IHashTableNode<T>>[];
+    /** Словарь для хранения ключей */
+    private keys: Record<string, number> = {};
 
-  /**
-   * @constructor
-   * @param {number} hashTableSize - Длина Хэш таблицы.
-   */
-  constructor(hashTableSize: number = HashTable.DEFAULT_TABLE_SIZE) {
-    this.buckets = new Array(hashTableSize)
-      .fill(null)
-      .map(() => new LinkedList());
-  }
-
-  /**
-   * Добавление значения в Хэш таблицу
-   * @public
-   * @param {string} key - Ключ для идентификации. 
-   * @param {T} value - Значение для добавления. 
-   */
-  public set(key: string, value: T): void {
-    const keyHash = this.hash(key);
-    this.keys[key] = keyHash;
-    const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
-    if (!node) {
-      bucketLinkedList.append({ key, value });
-    } else {
-      node.value.value = value;
-    }
-  }
-
-  /**
-   * Удаление элемента из Хэш таблицы
-   * @public
-   * @param {string} key - Ключ для удаления из Хэш таблицы
-   * @returns 
-   */
-  public delete(key: string): void {
-    const keyHash = this.hash(key);
-    delete this.keys[key];
-    const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
-    if (node) {
-      bucketLinkedList.remove((nodeValue: IHashTableNode<T>) => nodeValue.key === node.value.key);
-      return;
+    constructor(size: number = 32) {
+        this.buckets = new Array(size)
+            .fill(null)
+            .map(() => new LinkedList());
     }
 
-    return undefined;
-  }
+    /** Получение данных */
+    public get(key: string): T | null {
+        const keyHash = this.hash(key);
+        const bucketLinkedList = this.buckets[keyHash];
+        const node = bucketLinkedList.search((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
 
-  /**
-   * Получение значения из Хэш таблицы по ключу.
-   * @public
-   * @param {string} key - Ключ для поиска по Хэш таблице. 
-   * @returns {T}
-   */
-  public get(key: string): T | null {
-    const keyHash = this.hash(key);
-    const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
+        return node ? node.value.value : null;
+    }
 
-    return node ? node.value.value : null;
-  }
+    /** Установка данных */
+    public set(key: string, value: T): void {
+        const keyHash = this.hash(key);
+        this.keys[key] = keyHash;
+        const bucketLinkedList = this.buckets[keyHash];
+        const node = bucketLinkedList.search((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
+        if (!node) {
+            bucketLinkedList.append({ key, value });
+        } else {
+            node.value.value = value;
+        }
+    }
 
-  /**
-   * Существует ли элемент по данному ключу.
-   * @public
-   * @param {string} key - Ключ для проверки. 
-   * @returns {boolean}
-   */
-  public has(key: string): boolean {
-    return Object.hasOwnProperty.call(this.keys, key);
-  }
+    /** Генерация индекса для "Хэш таблицы" */
+    private hash(key: string): number {
+        const hash = Array.from(key).reduce(
+            (hashAccumulator, keySymbol) => (hashAccumulator + keySymbol.charCodeAt(0)),
+            0,
+        );
 
-  /**
-   * Получение массива ключей из Хэш таблицы.
-   * @public
-   * @returns {string[]}
-   */
-  public getKeys(): string[] {
-    return Object.keys(this.keys);
-  }
+        return hash % this.buckets.length;
+    }
 
-  /**
-   * Получение массива значений из Хэш таблицы.
-   * @public
-   * @returns {Array<T>}
-   */
-  public getValues(): Array<T> {
-    return this.buckets.reduce((values: Array<T>, bucket) => {
-      const bucketValues: Array<T> = bucket.toArray()
-        .map((linkedListNode) => linkedListNode.value.value);
-      return values.concat(bucketValues);
-    }, []);
-  }
+    /** Удаление данных */
+    public delete(key: string): void {
+        const keyHash = this.hash(key);
+        delete this.keys[key];
+        const bucketLinkedList = this.buckets[keyHash];
+        const node = bucketLinkedList.search((nodeValue: IHashTableNode<T>) => nodeValue.key === key);
+        if (node) {
+            bucketLinkedList.remove((nodeValue: IHashTableNode<T>) => nodeValue.key === node.value.key);
+            return;
+        }
 
-  /**
-   * Генерация индекса для Хэш таблицы.
-   * @private
-   * @param {string} key - Ключ, для которого нужно сгенерировать индекс.
-   * @returns {number}
-   */
-  private hash(key: string): number {
-    const hash = Array.from(key).reduce(
-      (hashAccumulator, keySymbol) => (hashAccumulator + keySymbol.charCodeAt(0)),
-      0,
-    );
+        return undefined;
+    }
 
-    return hash % this.buckets.length;
-  }
+    /** Проверка наличия данных */
+    public has(key: string): boolean {
+        return Object.hasOwnProperty.call(this.keys, key);
+    }
+
+    /** Привидение к массиву ключей */
+    public getKeys(): string[] {
+        return Object.keys(this.keys);
+    }
+
+    /** Привидение к массиву значений */
+    public getValues(): Array<T> {
+        return this.buckets.reduce((values: Array<T>, bucket) => {
+            const bucketValues: Array<T> = bucket.toArray()
+                .map((linkedListNode) => linkedListNode.value.value);
+            return values.concat(bucketValues);
+        }, []);
+    }
 }
