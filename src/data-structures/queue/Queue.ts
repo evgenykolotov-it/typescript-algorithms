@@ -1,50 +1,30 @@
-import LinkedList, { ILinkedList } from '../linked-list/LinkedList';
-import { ToStringCallback } from '../linked-list/LinkedListNode';
-
-/**
- * Итерфейс структуры данных очередь
- * @interface IQueue
- */
+/** Тип структуры очередь */
 export interface IQueue<T> {
+  /** Добавление элемента в очередь */
   enqueue: (value: T) => void;
+  /** Удаление элемента из очереди */
   dequeue: () => T | null;
-  toString: (callback?: ToStringCallback<T>) => string;
+  /** Приведение очереди к строке */
+  toString: (callback?: (value: T) => string) => string;
 }
 
-/**
- * @class
- * @classdesc Класс, реализующий структуру данных очередь.
- * @implements {IQueue}
- */
+/** Структура данных "Очередь" */
 export default class Queue<T> implements IQueue<T> {
-  private readonly linkedList: ILinkedList<T> = new LinkedList();
+  /** Массив для хранения очереди */
+  private readonly list: Array<T> = [];
 
-  /**
-   * Метод для добавления значения в очередь.
-   * @public
-   * @param {T} value - Значение, для добавления в очередь.
-   */
+  /** Добавление элемента в очередь */
   public enqueue(value: T): void {
-    this.linkedList.append(value);
+    this.list.push(value);
   }
 
-  /**
-   * Метод для удаления элемента из очереди.
-   * @public
-   * @returns {T | null}
-   */
+  /** Удаление элемента из очереди */
   public dequeue(): T | null {
-    const removedHead = this.linkedList.removeHead();
-    return removedHead ? removedHead.value : null;
+    return this.list.shift() ?? null;
   }
 
-  /**
-   * Метод для преобразования связного списка к строке.
-   * @public
-   * @param {ToStringCallback} callback - Функция для преобразования к строке.
-   * @returns {string}
-   */
-  public toString(callback?: ToStringCallback<T>): string {
-    return this.linkedList.toString(callback);
+  /** Приведение очереди к строке */
+  public toString(callback?: (value: T) => string): string {
+    return this.list.map(node => callback ? callback(node) : `${node}`).join(',');
   }
 }
